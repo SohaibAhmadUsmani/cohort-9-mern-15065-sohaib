@@ -1,9 +1,7 @@
 const express=require('express');
 const router=express.Router();
-router.post('/signup',(req,res)=>{
-    res.json({message:'Signed Up'})
-});
-router.post('/login',(req,res)=>{
-    res.json({message:'Logged In'})
-});
+const {signup,login}=require('../controllers/authController');  
+
+router.post('/signup',signup);
+router.post('/login',login);
 module.exports=router;
