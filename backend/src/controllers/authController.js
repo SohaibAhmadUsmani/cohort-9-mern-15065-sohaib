@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const signup=async(req,res)=>{
     try{
         const name=req.body.name;
-        const email=req.body.email;
+        const email=req.body.email?.toLowerCase().trim();
         const password=req.body.password;
         if(!name || !email || !password){
             return res.status(400).json({message:"All fields are required"});
@@ -36,7 +36,7 @@ const signup=async(req,res)=>{
 
 const login=async(req,res)=>{
     try{
-        const email=req.body.email;
+        const email=req.body.email?.toLowerCase().trim();
         const password=req.body.password;
         if(!email || !password){
             return res.status(400).json({message:"Email and password are required"});
@@ -50,7 +50,7 @@ const login=async(req,res)=>{
         return res.status(200).json({message:"User Logged In Successfully", token});
     }
     catch(err){
-        logger.error("Login Failed",err);
+        logger.error({err},"Login Failed");
         return res.status(500).json({message:"Internal Server Error"}); 
     }
 }

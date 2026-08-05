@@ -11,7 +11,7 @@ const createNote = async (req,res) => {
         logger.info(`Note created: ${note._id} by user ${req.user._id}`);
         return res.status(201).json({ message: 'Note created successfully', note });
     } catch (err) {
-        logger.error('Create note failed', err);
+        logger.error({err},'Create note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
@@ -21,7 +21,7 @@ const getNotes=async(req, res) => {
         logger.info(`Notes fetched for user ${req.user._id}: ${notes.length} notes`);
         return res.status(200).json({ notes });
     } catch (err) {
-        logger.error('Get notes failed', err);
+        logger.error({err},'Get notes failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
@@ -34,7 +34,7 @@ const getNote = async (req, res) => {
         logger.info(`Note fetched: ${note._id} by user ${req.user._id}`);
         return res.status(200).json({ note });
     } catch (err) {
-        logger.error('Get note failed', err);
+        logger.error({err},'Get note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
@@ -55,7 +55,7 @@ const updateNote = async (req, res) => {
         logger.info(`Note updated: ${note._id} by user ${req.user._id}`);
         return res.status(200).json({ message: 'Note updated successfully', note });
     } catch (err) {
-        logger.error('Update note failed', err);
+        logger.error({err},'Update note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
@@ -68,7 +68,7 @@ const deleteNote = async (req, res) => {
         logger.info(`Note deleted: ${note._id} by user ${req.user._id}`);
         return res.status(200).json({ message: 'Note deleted successfully' });
     } catch (err) {
-        logger.error('Delete note failed', err);
+        logger.error({err},'Delete note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
