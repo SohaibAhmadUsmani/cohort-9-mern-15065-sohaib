@@ -6,14 +6,29 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (token) {
-      api.get('/auth/me')
-        .then((res) => setUser(res.data.user))
-        .catch(() => localStorage.removeItem('token'))
-        .finally(() => setLoading(false))
-    } else {
+    if (!token) {
       setLoading(false)
+      return
     }
+
+    let active = true
+    api.get('/auth/me')
+      .then((res) => {
+        if (active && localStorage.getItem('token') === token) {
+          setUser(res.data.user)
+        }
+      })
+      .catch(() => {
+        if (active && localStorage.getItem('token') === token) {
+          localStorage.removeItem('token')
+          setUser(null)
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+
+    return () => { active = false }
   }, [])
 
   const signup = useCallback(async (name, email, password) => {
