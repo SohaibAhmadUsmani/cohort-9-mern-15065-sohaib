@@ -11,6 +11,9 @@ const signup=async(req,res)=>{
         if(!name || !email || !password){
             return res.status(400).json({message:"All fields are required"});
         }
+        if(typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string'){
+            return res.status(400).json({message:"Invalid field types"});
+        }
         if (Buffer.byteLength(password, 'utf8') > 72) {
             return res.status(400).json({ message: "Password must be at most 72 bytes" });
         }
@@ -41,6 +44,9 @@ const login=async(req,res)=>{
         if(!email || !password){
             return res.status(400).json({message:"Email and password are required"});
         }
+        if(typeof email !== 'string' || typeof password !== 'string'){
+            return res.status(400).json({message:"Invalid field types"});
+        }
         const user = await User.findOne({email:email});
         const isValid = user ? await bcrypt.compare(password, user.password) : false;
         if(!isValid){
@@ -54,4 +60,18 @@ const login=async(req,res)=>{
         return res.status(500).json({message:"Internal Server Error"}); 
     }
 }
-module.exports = {signup,login};
+
+const getMe=async(req,res)=>{
+    try{
+        const user = await User.findById(req.user._id).select('-password');
+        if(!user){
+            return res.status(404).json({message:"User Not Found"});
+        }
+        return res.status(200).json({user});
+    }
+    catch(err){
+        logger.error({err},"Get Profile Failed");
+        return res.status(500).json({message:"Internal Server Error"}); 
+    }
+}
+module.exports = {signup,login,getMe};
