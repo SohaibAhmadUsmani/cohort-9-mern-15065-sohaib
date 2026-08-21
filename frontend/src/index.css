@@ -1,2 +1,16 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
+
+.line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.line-clamp-6 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; }
+
+.dark .ql-toolbar { background: #374151; border-color: #4b5563; }
+.dark .ql-container { border-color: #4b5563; }
+.dark .ql-editor { color: #f3f4f6; }
+.dark .ql-toolbar .ql-stroke { stroke: #d1d5db; }
+.dark .ql-toolbar .ql-fill { fill: #d1d5db; }
+.dark .ql-toolbar .ql-picker { color: #d1d5db; }
+.dark .ql-toolbar .ql-picker-options { background: #374151; border-color: #4b5563; }
+.dark .ql-toolbar button:hover .ql-stroke { stroke: #60a5fa; }
+.dark .ql-toolbar button.ql-active .ql-stroke { stroke: #3b82f6; }
+.dark .ql-editor.ql-blank::before { color: #6b7280; }
