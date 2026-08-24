@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react'
 import { useNotes } from '../context/NotesContext'
 
 export default function DeleteModal() {
@@ -11,7 +12,7 @@ export default function DeleteModal() {
     try {
       await removeNote(showDelete._id)
     } catch {
-      // toast handled in context
+      // toast in context
     } finally {
       setDeleting(false)
     }
@@ -24,7 +25,7 @@ export default function DeleteModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
           onClick={() => setShowDelete(null)}
         >
           <motion.div
@@ -32,25 +33,30 @@ export default function DeleteModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={e => e.stopPropagation()}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-sm p-6"
+            className="bg-[var(--bg-secondary)] rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-[var(--border)]"
           >
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Delete Note</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Are you sure you want to delete "<span dangerouslySetInnerHTML={{ __html: showDelete.title }} />"? This cannot be undone.
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-[var(--text-primary)]">Delete Note</h2>
+              <button onClick={() => setShowDelete(null)} className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+            <p className="text-sm text-[var(--text-secondary)] mb-6">
+              Are you sure you want to delete this note? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDelete(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] rounded-xl transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
-                className="px-5 py-2 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                className="px-5 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors disabled:opacity-50"
               >
-                {deleting ? 'Deleting...' : 'Delete'}
+                {deleting ? 'Deleting...' : 'Delete Note'}
               </button>
             </div>
           </motion.div>
