@@ -91,15 +91,15 @@ export default function NoteModal() {
                 <X size={18} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="flex-1 flex flex-col p-6 gap-4 overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex flex-col p-6 gap-4" style={{ height: '75vh' }}>
               <input
                 type="text"
                 placeholder="Note title"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm shrink-0"
               />
-              <div className="flex-1 min-h-0 flex flex-col">
+              <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                 <ReactQuill
                   key={quillKey}
                   theme="snow"
@@ -108,10 +108,10 @@ export default function NoteModal() {
                   onEditorCreated={handleQuillReady}
                   modules={{ toolbar: toolbarOptions }}
                   placeholder="Write your note..."
-                  className="flex-1 flex flex-col min-h-0 [&_.ql-container]:flex-1 [&_.ql-container]:min-h-0 [&_.ql-container]:h-auto [&_.ql-editor]:min-h-[200px]"
+                  className="flex-1 flex flex-col min-h-0 [&_.ql-container]:flex-1 [&_.ql-container]:min-h-0 [&_.ql-editor]:overflow-y-auto [&_.ql-editor]:max-h-full"
                 />
               </div>
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="flex justify-end gap-3 pt-2 shrink-0 border-t border-[var(--border)]">
                 <button type="button" onClick={handleClose} className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] rounded-xl transition-colors">
                   Cancel
                 </button>
