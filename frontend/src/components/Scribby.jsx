@@ -53,7 +53,7 @@ export default function Scribby({ open, setOpen }) {
           >
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <img src="/MemoraLogo.png" alt="Scribby" className="w-10 h-10 rounded-xl" />
+                <img src="/koala.png" alt="Scribby" className="w-10 h-10 rounded-xl" />
                 <div>
                   <h2 className="text-base font-semibold text-[var(--text-primary)]">Scribby</h2>
                   <p className="text-xs text-[var(--text-secondary)]">AI-powered note generator</p>

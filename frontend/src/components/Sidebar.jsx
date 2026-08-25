@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { FileText, Star, Trash2, Moon, Sun, LogOut, Upload, Download, PanelLeftClose, PanelLeft, Sparkles } from 'lucide-react'
+import { FileText, Star, Trash2, Moon, Sun, LogOut, Upload, Download, PanelLeftClose, PanelLeft } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useNotes } from '../context/NotesContext'
 import Scribby from './Scribby'
@@ -38,7 +38,7 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
             </button>
           ))}
           <button onClick={() => setScribbyOpen(true)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors" title="Scribby">
-            <Sparkles size={18} />
+            <img src="/koala.png" alt="S" className="w-[18px] h-[18px] rounded" />
           </button>
           <div className="flex-1" />
           <button onClick={() => setDark(d => !d)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors" title="Toggle theme">
@@ -95,7 +95,7 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
             onClick={() => setScribbyOpen(true)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors"
           >
-            <Sparkles size={18} />
+            <img src="/koala.png" alt="S" className="w-[18px] h-[18px] rounded" />
             Scribby
           </button>
         </nav>

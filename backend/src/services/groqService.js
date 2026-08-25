@@ -18,10 +18,9 @@ Return ONLY a JSON object with two fields: "title" (string) and "content" (HTML 
           content: prompt
         }
       ],
-      model: 'llama-3.1-8b-instant',
+      model: 'groq/compound',
       temperature: 0.7,
       max_tokens: 2048,
-      response_format: { type: 'json_object' }
     });
 
     const response = completion.choices[0]?.message?.content;
