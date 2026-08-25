@@ -32,6 +32,8 @@ export default function NoteModal() {
   const handleClose = () => {
     setShowModal(false)
     setEditingNote(null)
+    setTitle('')
+    setContent('')
   }
 
   const handleSubmit = async (e) => {
@@ -86,6 +88,7 @@ export default function NoteModal() {
               />
               <div className="flex-1 min-h-0 flex flex-col">
                 <ReactQuill
+                  key={editingNote?._id || 'new'}
                   theme="snow"
                   value={content}
                   onChange={setContent}
