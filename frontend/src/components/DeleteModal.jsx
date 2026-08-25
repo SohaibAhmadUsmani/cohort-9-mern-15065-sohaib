@@ -25,7 +25,7 @@ export default function DeleteModal() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
           onClick={() => setShowDelete(null)}
         >
           <motion.div
@@ -33,7 +33,7 @@ export default function DeleteModal() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             onClick={e => e.stopPropagation()}
-            className="bg-[var(--bg-secondary)] rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-[var(--border)]"
+            className="bg-[var(--bg-primary)] rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-[var(--border)]"
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-[var(--text-primary)]">Move to Trash</h2>

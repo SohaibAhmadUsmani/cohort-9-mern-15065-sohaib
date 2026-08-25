@@ -3,20 +3,18 @@
 
 * { font-family: 'Inter', system-ui, sans-serif; }
 
-/* Light mode base */
 :root {
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-surface: #f1f5f9;
-  --border: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --accent: #7c5cff;
-  --accent-hover: #6d4fef;
-  --accent-light: rgba(124, 92, 255, 0.1);
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAFAFA;
+  --bg-surface: #F9F7FC;
+  --border: #E5E7EB;
+  --text-primary: #1E1B2E;
+  --text-secondary: #6B7280;
+  --accent: #A855F7;
+  --accent-hover: #9333EA;
+  --accent-light: #F3E8FF;
 }
 
-/* Dark mode base */
 .dark {
   --bg-primary: #0B0F19;
   --bg-secondary: #111827;
@@ -24,9 +22,9 @@
   --border: rgba(255,255,255,0.06);
   --text-primary: #F8FAFC;
   --text-secondary: #94A3B8;
-  --accent: #7c5cff;
-  --accent-hover: #8B5CF6;
-  --accent-light: rgba(124, 92, 255, 0.15);
+  --accent: #A855F7;
+  --accent-hover: #9333EA;
+  --accent-light: rgba(168, 85, 247, 0.15);
 }
 
 body {
@@ -34,19 +32,16 @@ body {
   color: var(--text-primary);
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
 .dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
-/* Line clamp */
 .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
 .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 
-/* Quill dark mode */
 .dark .ql-toolbar { background: #1A2030 !important; border-color: rgba(255,255,255,0.06) !important; }
 .dark .ql-container { border-color: rgba(255,255,255,0.06) !important; background: transparent !important; }
 .dark .ql-editor { color: #F8FAFC !important; }
@@ -54,26 +49,24 @@ body {
 .dark .ql-toolbar .ql-fill { fill: #94A3B8 !important; }
 .dark .ql-toolbar .ql-picker { color: #94A3B8 !important; }
 .dark .ql-toolbar .ql-picker-options { background: #1A2030 !important; border-color: rgba(255,255,255,0.06) !important; }
-.dark .ql-toolbar button:hover .ql-stroke { stroke: #7c5cff !important; }
-.dark .ql-toolbar button.ql-active .ql-stroke { stroke: #7c5cff !important; }
+.dark .ql-toolbar button:hover .ql-stroke { stroke: #A855F7 !important; }
+.dark .ql-toolbar button.ql-active .ql-stroke { stroke: #A855F7 !important; }
 .dark .ql-editor.ql-blank::before { color: #475569 !important; font-style: normal !important; }
 
-/* Light mode Quill */
-.ql-toolbar { background: #ffffff !important; border-color: #e2e8f0 !important; border-radius: 8px 8px 0 0 !important; }
-.ql-container { border-color: #e2e8f0 !important; border-radius: 0 0 8px 8px !important; }
-.ql-editor { color: #0f172a !important; min-height: 200px; }
-.ql-editor.ql-blank::before { color: #94a3b8 !important; font-style: normal !important; }
-.ql-toolbar button:hover .ql-stroke { stroke: #7c5cff !important; }
-.ql-toolbar button.ql-active .ql-stroke { stroke: #7c5cff !important; }
-.ql-toolbar .ql-picker { color: #64748b !important; }
+.ql-toolbar { background: #FAFAFA !important; border-color: #E5E7EB !important; border-radius: 8px 8px 0 0 !important; }
+.ql-container { border-color: #E5E7EB !important; border-radius: 0 0 8px 8px !important; }
+.ql-editor { color: #1E1B2E !important; min-height: 200px; }
+.ql-editor.ql-blank::before { color: #6B7280 !important; font-style: normal !important; }
+.ql-toolbar button:hover .ql-stroke { stroke: #A855F7 !important; }
+.ql-toolbar button.ql-active .ql-stroke { stroke: #A855F7 !important; }
+.ql-toolbar .ql-picker { color: #6B7280 !important; }
 
-/* Skeleton shimmer */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, var(--bg-surface) 25%, rgba(255,255,255,0.05) 50%, var(--bg-surface) 75%);
+  background: linear-gradient(90deg, var(--bg-surface) 25%, rgba(0,0,0,0.03) 50%, var(--bg-surface) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

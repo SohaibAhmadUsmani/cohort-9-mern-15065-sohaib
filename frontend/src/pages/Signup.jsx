@@ -29,16 +29,14 @@ export default function Signup() {
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)] px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-[#7c5cff] to-[#a78bfa] flex items-center justify-center text-white font-bold text-lg">
-            M
-          </div>
+          <img src="/MemoraLogo.png" alt="Memora" className="w-12 h-12 mx-auto mb-4 rounded-xl" />
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Create Account</h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">Get started with Memora</p>
         </div>
-        <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-lg p-8 border border-[var(--border)]">
+        <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-sm p-8 border border-[var(--border)]">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="signup-name" className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+              <label htmlFor="signup-name" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                 Name
               </label>
               <input
@@ -47,12 +45,12 @@ export default function Signup() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
                 placeholder="Your name"
               />
             </div>
             <div>
-              <label htmlFor="signup-email" className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+              <label htmlFor="signup-email" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                 Email
               </label>
               <input
@@ -61,12 +59,12 @@ export default function Signup() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
                 placeholder="you@example.com"
               />
             </div>
             <div>
-              <label htmlFor="signup-password" className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+              <label htmlFor="signup-password" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
                 Password
               </label>
               <input
@@ -76,14 +74,14 @@ export default function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
                 placeholder="At least 6 characters"
               />
             </div>
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 px-4 bg-gradient-to-r from-[#7c5cff] to-[#a78bfa] hover:opacity-90 disabled:opacity-50 text-white font-semibold rounded-xl transition-opacity text-sm"
+              className="w-full py-2.5 px-4 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm"
             >
               {submitting ? 'Creating account...' : 'Create Account'}
             </button>
