@@ -18,14 +18,18 @@ export default function NoteModal() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [saving, setSaving] = useState(false)
+  const [quillKey, setQuillKey] = useState(0)
 
   useEffect(() => {
-    if (editingNote) {
-      setTitle(editingNote.title)
-      setContent(editingNote.content)
-    } else {
-      setTitle('')
-      setContent('')
+    if (showModal) {
+      if (editingNote) {
+        setTitle(editingNote.title)
+        setContent(editingNote.content)
+      } else {
+        setTitle('')
+        setContent('')
+      }
+      setQuillKey(k => k + 1)
     }
   }, [editingNote, showModal])
 
@@ -88,9 +92,9 @@ export default function NoteModal() {
               />
               <div className="flex-1 min-h-0 flex flex-col">
                 <ReactQuill
-                  key={editingNote?._id || 'new'}
+                  key={quillKey}
                   theme="snow"
-                  value={content}
+                  defaultValue={content}
                   onChange={setContent}
                   modules={{ toolbar: toolbarOptions }}
                   placeholder="Write your note..."
