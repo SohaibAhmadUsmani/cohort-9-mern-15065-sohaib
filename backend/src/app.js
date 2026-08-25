@@ -16,6 +16,7 @@ const authLimiter=rateLimit({
 })
 app.use('/api/auth',authLimiter, require('./routes/authRoutes'));
 app.use('/api/notes', require('./routes/noteRoutes'));
+app.use('/api/ai', require('./routes/aiRoutes'));
 app.use((err, req, res, next) => {
     logger.error({ err }, 'Unhandled request error');
     if (res.headersSent) {
