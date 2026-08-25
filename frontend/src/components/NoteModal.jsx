@@ -84,14 +84,14 @@ export default function NoteModal() {
                 onChange={e => setTitle(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
               />
-              <div className="flex-1 min-h-0">
+              <div className="flex-1 min-h-0 flex flex-col">
                 <ReactQuill
                   theme="snow"
                   value={content}
                   onChange={setContent}
                   modules={{ toolbar: toolbarOptions }}
                   placeholder="Write your note..."
-                  className="h-full"
+                  className="flex-1 flex flex-col min-h-0 [&_.ql-container]:flex-1 [&_.ql-container]:min-h-0 [&_.ql-container]:h-auto [&_.ql-editor]:min-h-[200px]"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">

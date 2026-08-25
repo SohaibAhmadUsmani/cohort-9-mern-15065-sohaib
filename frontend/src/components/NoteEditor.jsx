@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Star, Pencil, Trash2, RotateCcw, Tag } from 'lucide-react'
 import { useNotes } from '../context/NotesContext'
+import DOMPurify from 'dompurify'
 
 export default function NoteEditor() {
   const { selectedNote, meta, toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag, setShowModal, setEditingNote, tags: tagList } = useNotes()
@@ -131,7 +132,7 @@ export default function NoteEditor() {
       <div className="flex-1 overflow-y-auto px-6 py-5">
         <div
           className="prose prose-sm dark:prose-invert max-w-none text-[var(--text-primary)] [&_h1]:text-xl [&_h1]:font-semibold [&_h2]:text-lg [&_h2]:font-semibold [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:mb-1 [&_blockquote]:border-l-4 [&_blockquote]:border-[var(--accent)] [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-[var(--text-secondary)] [&_code]:bg-[var(--bg-surface)] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_a]:text-[var(--accent)] [&_a]:underline"
-          dangerouslySetInnerHTML={{ __html: selectedNote.content }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedNote.content) }}
         />
       </div>
     </motion.div>

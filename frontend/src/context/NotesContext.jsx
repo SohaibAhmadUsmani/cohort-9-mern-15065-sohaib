@@ -54,11 +54,15 @@ export function NotesProvider({ children }) {
   }, [updateMeta])
 
   const permanentDelete = useCallback(async (noteId) => {
-    await noteService.deleteNote(noteId)
-    setNotes(prev => prev.filter(n => n._id !== noteId))
-    setMeta(prev => { const next = { ...prev }; delete next[noteId]; return next })
-    if (selectedNote?._id === noteId) setSelectedNote(null)
-    toast.success('Permanently deleted')
+    try {
+      await noteService.deleteNote(noteId)
+      setNotes(prev => prev.filter(n => n._id !== noteId))
+      setMeta(prev => { const next = { ...prev }; delete next[noteId]; return next })
+      if (selectedNote?._id === noteId) setSelectedNote(null)
+      toast.success('Permanently deleted')
+    } catch {
+      toast.error('Failed to delete note')
+    }
   }, [selectedNote])
 
   const setTag = useCallback((noteId, tag) => {
@@ -82,20 +86,28 @@ export function NotesProvider({ children }) {
   }, [])
 
   const addNote = useCallback(async (title, content) => {
-    const res = await noteService.createNote({ title, content })
-    setNotes(prev => [res.note, ...prev])
-    setSelectedNote(res.note)
-    toast.success('Note created')
-    setShowModal(false)
+    try {
+      const res = await noteService.createNote({ title, content })
+      setNotes(prev => [res.note, ...prev])
+      setSelectedNote(res.note)
+      toast.success('Note created')
+      setShowModal(false)
+    } catch {
+      toast.error('Failed to create note')
+    }
   }, [])
 
   const updateNote = useCallback(async (id, title, content) => {
-    const res = await noteService.updateNote(id, { title, content })
-    setNotes(prev => prev.map(n => n._id === id ? res.note : n))
-    if (selectedNote?._id === id) setSelectedNote(res.note)
-    toast.success('Note updated')
-    setEditingNote(null)
-    setShowModal(false)
+    try {
+      const res = await noteService.updateNote(id, { title, content })
+      setNotes(prev => prev.map(n => n._id === id ? res.note : n))
+      if (selectedNote?._id === id) setSelectedNote(res.note)
+      toast.success('Note updated')
+      setEditingNote(null)
+      setShowModal(false)
+    } catch {
+      toast.error('Failed to update note')
+    }
   }, [selectedNote])
 
   const removeNote = useCallback(async (id) => {
