@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ReactQuill from 'react-quill-new'
 import 'react-quill-new/dist/quill.snow.css'
@@ -19,25 +19,34 @@ export default function NoteModal() {
   const [content, setContent] = useState('')
   const [saving, setSaving] = useState(false)
   const [quillKey, setQuillKey] = useState(0)
+  const pendingContent = useRef('')
 
   useEffect(() => {
     if (showModal) {
       if (editingNote) {
         setTitle(editingNote.title)
-        setContent(editingNote.content)
+        pendingContent.current = editingNote.content
       } else {
         setTitle('')
-        setContent('')
+        pendingContent.current = ''
       }
+      setContent(pendingContent.current)
       setQuillKey(k => k + 1)
     }
   }, [editingNote, showModal])
+
+  const handleQuillReady = (quill) => {
+    if (pendingContent.current) {
+      quill.root.innerHTML = pendingContent.current
+    }
+  }
 
   const handleClose = () => {
     setShowModal(false)
     setEditingNote(null)
     setTitle('')
     setContent('')
+    pendingContent.current = ''
   }
 
   const handleSubmit = async (e) => {
@@ -94,8 +103,9 @@ export default function NoteModal() {
                 <ReactQuill
                   key={quillKey}
                   theme="snow"
-                  defaultValue={content}
+                  defaultValue={pendingContent.current}
                   onChange={setContent}
+                  onEditorCreated={handleQuillReady}
                   modules={{ toolbar: toolbarOptions }}
                   placeholder="Write your note..."
                   className="flex-1 flex flex-col min-h-0 [&_.ql-container]:flex-1 [&_.ql-container]:min-h-0 [&_.ql-container]:h-auto [&_.ql-editor]:min-h-[200px]"
