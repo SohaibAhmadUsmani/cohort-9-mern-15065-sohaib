@@ -1,20 +1,10 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { FileText, Star, Trash2, Moon, Sun, LogOut, ChevronDown } from 'lucide-react'
+import { FileText, Star, Trash2, Moon, Sun, LogOut } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useNotes } from '../context/NotesContext'
 
-const tags = [
-  { name: 'Work', color: '#7c5cff', count: 0 },
-  { name: 'Personal', color: '#3b82f6', count: 0 },
-  { name: 'Ideas', color: '#22c55e', count: 0 },
-  { name: 'Study', color: '#f59e0b', count: 0 },
-]
-
 export default function Sidebar({ dark, setDark, onLogout }) {
   const { user } = useAuth()
-  const { filter, setFilter, setShowModal } = useNotes()
-  const [collapsed, setCollapsed] = useState(false)
+  const { filter, setFilter, setShowModal, tagCounts, tags } = useNotes()
 
   const navItems = [
     { id: 'all', label: 'All Notes', icon: FileText },
@@ -22,13 +12,13 @@ export default function Sidebar({ dark, setDark, onLogout }) {
     { id: 'trash', label: 'Trash', icon: Trash2 },
   ]
 
+  const tagColors = { Work: '#7c5cff', Personal: '#3b82f6', Ideas: '#22c55e', Study: '#f59e0b' }
+
   return (
     <aside className="w-64 h-full flex flex-col bg-[var(--bg-secondary)] border-r border-[var(--border)]">
       {/* Brand */}
       <div className="px-5 py-5 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#7c5cff] to-[#a78bfa] flex items-center justify-center text-white font-bold text-sm">
-          M
-        </div>
+        <img src="/MemoraLogo.png" alt="Memora" className="w-9 h-9 rounded-xl" />
         <span className="text-lg font-semibold text-[var(--text-primary)]">Memora</span>
       </div>
 
@@ -65,17 +55,22 @@ export default function Sidebar({ dark, setDark, onLogout }) {
       <div className="px-5 mb-6">
         <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Tags</h3>
         {tags.map(tag => (
-          <div key={tag.name} className="flex items-center justify-between py-1.5">
+          <button
+            key={tag}
+            onClick={() => setFilter(filter === tag ? 'all' : tag)}
+            className={`w-full flex items-center justify-between py-1.5 transition-colors ${
+              filter === tag ? 'opacity-100' : 'opacity-70 hover:opacity-100'
+            }`}
+          >
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ background: tag.color }} />
-              <span className="text-sm text-[var(--text-secondary)]">{tag.name}</span>
+              <div className="w-2 h-2 rounded-full" style={{ background: tagColors[tag] }} />
+              <span className="text-sm text-[var(--text-secondary)]">{tag}</span>
             </div>
-            <span className="text-xs text-[var(--text-secondary)] opacity-60">{tag.count}</span>
-          </div>
+            <span className="text-xs text-[var(--text-secondary)] opacity-60">{tagCounts[tag] || 0}</span>
+          </button>
         ))}
       </div>
 
-      {/* Spacer */}
       <div className="flex-1" />
 
       {/* Dark Mode Toggle */}

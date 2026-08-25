@@ -1,44 +1,19 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import ReactQuill from 'react-quill-new'
-import 'react-quill-new/dist/quill.snow.css'
-import { Star, Pencil, Trash2, MoreHorizontal, Clock } from 'lucide-react'
+import { Star, Pencil, Trash2, RotateCcw, Tag } from 'lucide-react'
 import { useNotes } from '../context/NotesContext'
 
-const toolbarOptions = [
-  [{ header: [1, 2, false] }],
-  [{ list: 'ordered' }, { list: 'bullet' }],
-  ['bold', 'italic', 'underline', 'strike'],
-  ['code', 'link', 'blockquote'],
-  ['undo', 'redo'],
-]
-
 export default function NoteEditor() {
-  const { selectedNote, editingNote, setEditingNote, setShowModal, setShowDelete, updateNote } = useNotes()
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [isEditing, setIsEditing] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const { selectedNote, meta, toggleFavorite, moveToTrash, restoreFromTrash, setTag, setShowModal, setEditingNote, tags: tagList } = useNotes()
+  const [showTagMenu, setShowTagMenu] = useState(false)
 
-  useEffect(() => {
-    if (selectedNote) {
-      setTitle(selectedNote.title || '')
-      setContent(selectedNote.content || '')
-      setIsEditing(false)
-    }
-  }, [selectedNote])
+  const m = meta[selectedNote?._id] || {}
+  const isTrash = m.deleted
 
-  const handleSave = async () => {
-    if (!title.trim() || !content.trim()) return
-    setSaving(true)
-    try {
-      await updateNote(selectedNote._id, title, content)
-      setIsEditing(false)
-    } catch {
-      // toast in context
-    } finally {
-      setSaving(false)
-    }
+  const stripHtml = (html) => {
+    const tmp = document.createElement('div')
+    tmp.innerHTML = html
+    return tmp.textContent || tmp.innerText || ''
   }
 
   const handleEdit = () => {
@@ -59,6 +34,8 @@ export default function NoteEditor() {
     )
   }
 
+  const tagColors = { Work: '#7c5cff', Personal: '#3b82f6', Ideas: '#22c55e', Study: '#f59e0b' }
+
   return (
     <motion.div
       key={selectedNote._id}
@@ -69,22 +46,74 @@ export default function NoteEditor() {
       {/* Header */}
       <div className="px-6 py-4 border-b border-[var(--border)] flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-[var(--text-primary)] mb-1">{selectedNote.title}</h1>
+          <h1 className="text-xl font-semibold text-[var(--text-primary)] mb-1">{stripHtml(selectedNote.title)}</h1>
           <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-            <Clock size={12} />
-            <span>Updated {new Date(selectedNote.updatedAt || selectedNote.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            {m.tag && (
+              <span className="px-2 py-0.5 rounded-full text-white text-[10px] font-medium" style={{ background: tagColors[m.tag] || '#6b7280' }}>
+                {m.tag}
+              </span>
+            )}
+            <span>•</span>
+            <span>{new Date(selectedNote.updatedAt || selectedNote.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-yellow-400 hover:bg-[var(--bg-surface)] transition-colors" title="Favorite">
-            <Star size={18} />
+          <div className="relative">
+            <button
+              onClick={() => setShowTagMenu(!showTagMenu)}
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--bg-surface)] transition-colors"
+              title="Set tag"
+            >
+              <Tag size={18} />
+            </button>
+            {showTagMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl shadow-lg py-1 z-10 w-32">
+                {tagList.map(tag => (
+                  <button
+                    key={tag}
+                    onClick={() => { setTag(selectedNote._id, tag); setShowTagMenu(false) }}
+                    className={`w-full text-left px-3 py-1.5 text-sm hover:bg-[var(--bg-surface)] flex items-center gap-2 ${m.tag === tag ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'}`}
+                  >
+                    <div className="w-2 h-2 rounded-full" style={{ background: tagColors[tag] }} />
+                    {tag}
+                  </button>
+                ))}
+                {m.tag && (
+                  <button
+                    onClick={() => { setTag(selectedNote._id, null); setShowTagMenu(false) }}
+                    className="w-full text-left px-3 py-1.5 text-sm text-red-400 hover:bg-[var(--bg-surface)]"
+                  >
+                    Remove tag
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => toggleFavorite(selectedNote._id)}
+            className={`p-2 rounded-lg transition-colors ${m.favorite ? 'text-yellow-400' : 'text-[var(--text-secondary)] hover:text-yellow-400 hover:bg-[var(--bg-surface)]'}`}
+            title="Favorite"
+          >
+            <Star size={18} fill={m.favorite ? 'currentColor' : 'none'} />
           </button>
-          <button onClick={handleEdit} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--bg-surface)] transition-colors" title="Edit">
-            <Pencil size={18} />
-          </button>
-          <button onClick={() => setShowDelete(selectedNote)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-red-400 hover:bg-[var(--bg-surface)] transition-colors" title="Delete">
-            <Trash2 size={18} />
-          </button>
+          {isTrash ? (
+            <button
+              onClick={() => restoreFromTrash(selectedNote._id)}
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-green-400 hover:bg-[var(--bg-surface)] transition-colors"
+              title="Restore"
+            >
+              <RotateCcw size={18} />
+            </button>
+          ) : (
+            <>
+              <button onClick={handleEdit} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--bg-surface)] transition-colors" title="Edit">
+                <Pencil size={18} />
+              </button>
+              <button onClick={() => moveToTrash(selectedNote._id)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-red-400 hover:bg-[var(--bg-surface)] transition-colors" title="Delete">
+                <Trash2 size={18} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 

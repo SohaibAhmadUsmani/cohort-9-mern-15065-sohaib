@@ -1,8 +1,19 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import noteService from '../services/noteService'
 import toast from 'react-hot-toast'
 
 const NotesContext = createContext(null)
+
+const META_KEY = 'memora_notes_meta'
+
+function loadMeta() {
+  try { return JSON.parse(localStorage.getItem(META_KEY) || '{}') }
+  catch { return {} }
+}
+
+function saveMeta(meta) {
+  localStorage.setItem(META_KEY, JSON.stringify(meta))
+}
 
 export function NotesProvider({ children }) {
   const [notes, setNotes] = useState([])
@@ -13,6 +24,46 @@ export function NotesProvider({ children }) {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [editingNote, setEditingNote] = useState(null)
+  const [meta, setMeta] = useState(loadMeta)
+
+  useEffect(() => { saveMeta(meta) }, [meta])
+
+  const updateMeta = useCallback((noteId, updates) => {
+    setMeta(prev => ({
+      ...prev,
+      [noteId]: { ...(prev[noteId] || {}), ...updates }
+    }))
+  }, [])
+
+  const toggleFavorite = useCallback((noteId) => {
+    setMeta(prev => ({
+      ...prev,
+      [noteId]: { ...(prev[noteId] || {}), favorite: !(prev[noteId]?.favorite) }
+    }))
+  }, [])
+
+  const moveToTrash = useCallback((noteId) => {
+    updateMeta(noteId, { deleted: true })
+    if (selectedNote?._id === noteId) setSelectedNote(null)
+    toast.success('Moved to trash')
+  }, [selectedNote, updateMeta])
+
+  const restoreFromTrash = useCallback((noteId) => {
+    updateMeta(noteId, { deleted: false })
+    toast.success('Restored from trash')
+  }, [updateMeta])
+
+  const permanentDelete = useCallback(async (noteId) => {
+    await noteService.deleteNote(noteId)
+    setNotes(prev => prev.filter(n => n._id !== noteId))
+    setMeta(prev => { const next = { ...prev }; delete next[noteId]; return next })
+    if (selectedNote?._id === noteId) setSelectedNote(null)
+    toast.success('Permanently deleted')
+  }, [selectedNote])
+
+  const setTag = useCallback((noteId, tag) => {
+    updateMeta(noteId, { tag })
+  }, [updateMeta])
 
   const fetchNotes = useCallback(async () => {
     setLoading(true)
@@ -20,7 +71,8 @@ export function NotesProvider({ children }) {
       const data = await noteService.getNotes()
       setNotes(data)
       if (data.length > 0 && !selectedNote) {
-        setSelectedNote(data[0])
+        const first = data.find(n => !meta[n._id]?.deleted)
+        if (first) setSelectedNote(first)
       }
     } catch {
       toast.error('Failed to load notes')
@@ -47,16 +99,26 @@ export function NotesProvider({ children }) {
   }, [selectedNote])
 
   const removeNote = useCallback(async (id) => {
-    await noteService.deleteNote(id)
-    setNotes(prev => prev.filter(n => n._id !== id))
-    if (selectedNote?._id === id) {
-      setSelectedNote(null)
+    moveToTrash(id)
+  }, [moveToTrash])
+
+  const tagCounts = {}
+  const tags = ['Work', 'Personal', 'Ideas', 'Study']
+  notes.forEach(n => {
+    const m = meta[n._id]
+    if (m?.tag && !m?.deleted) {
+      tagCounts[m.tag] = (tagCounts[m.tag] || 0) + 1
     }
-    toast.success('Note deleted')
-    setShowDelete(null)
-  }, [selectedNote])
+  })
 
   const filteredNotes = notes.filter(note => {
+    const m = meta[note._id]
+    if (m?.deleted && filter !== 'trash') return false
+    if (!m?.deleted && filter === 'trash') return false
+    if (filter === 'favorites' && !m?.favorite) return false
+    if (filter !== 'all' && filter !== 'favorites' && filter !== 'trash') {
+      if (m?.tag !== filter) return false
+    }
     if (search) {
       const q = search.toLowerCase()
       return (note.title || '').toLowerCase().includes(q) || (note.content || '').toLowerCase().includes(q)
@@ -67,10 +129,11 @@ export function NotesProvider({ children }) {
   return (
     <NotesContext.Provider value={{
       notes, filteredNotes, loading, selectedNote, showModal, showDelete,
-      search, filter, editingNote,
+      search, filter, editingNote, meta, tagCounts, tags,
       fetchNotes, addNote, updateNote, removeNote,
       setSelectedNote, setShowModal, setShowDelete,
-      setSearch, setFilter, setEditingNote
+      setSearch, setFilter, setEditingNote,
+      toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag
     }}>
       {children}
     </NotesContext.Provider>

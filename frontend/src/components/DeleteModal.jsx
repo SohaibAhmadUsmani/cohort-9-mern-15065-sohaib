@@ -36,13 +36,13 @@ export default function DeleteModal() {
             className="bg-[var(--bg-secondary)] rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-[var(--border)]"
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-[var(--text-primary)]">Delete Note</h2>
+              <h2 className="text-base font-semibold text-[var(--text-primary)]">Move to Trash</h2>
               <button onClick={() => setShowDelete(null)} className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors">
                 <X size={18} />
               </button>
             </div>
             <p className="text-sm text-[var(--text-secondary)] mb-6">
-              Are you sure you want to delete this note? This action cannot be undone.
+              This note will be moved to trash. You can restore it later.
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -56,7 +56,7 @@ export default function DeleteModal() {
                 disabled={deleting}
                 className="px-5 py-2 text-sm font-medium bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors disabled:opacity-50"
               >
-                {deleting ? 'Deleting...' : 'Delete Note'}
+                {deleting ? 'Moving...' : 'Move to Trash'}
               </button>
             </div>
           </motion.div>
