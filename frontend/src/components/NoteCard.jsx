@@ -14,7 +14,9 @@ export default function NoteCard({ note, index }) {
   }
 
   const preview = stripHtml(note.content || '').slice(0, 80)
-  const time = new Date(note.updatedAt || note.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  const time = note.updatedAt || note.createdAt
+    ? new Date(note.updatedAt || note.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    : ''
 
   return (
     <motion.button

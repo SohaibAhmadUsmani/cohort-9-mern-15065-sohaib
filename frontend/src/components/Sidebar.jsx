@@ -1,10 +1,12 @@
-import { FileText, Star, Trash2, Moon, Sun, LogOut } from 'lucide-react'
+import { FileText, Star, Trash2, Moon, Sun, LogOut, Download, Upload } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useNotes } from '../context/NotesContext'
+import { useRef } from 'react'
 
 export default function Sidebar({ dark, setDark, onLogout }) {
   const { user } = useAuth()
-  const { filter, setFilter, setShowModal, tagCounts, tags } = useNotes()
+  const { filter, setFilter, setShowModal, tagCounts, tags, exportNotes, importNotes } = useNotes()
+  const fileInputRef = useRef(null)
 
   const navItems = [
     { id: 'all', label: 'All Notes', icon: FileText },
@@ -72,6 +74,31 @@ export default function Sidebar({ dark, setDark, onLogout }) {
       </div>
 
       <div className="flex-1" />
+
+      {/* Export/Import */}
+      <div className="px-4 mb-3 flex gap-2">
+        <button
+          onClick={exportNotes}
+          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors border border-[var(--border)]"
+        >
+          <Download size={14} />
+          Export
+        </button>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors border border-[var(--border)]"
+        >
+          <Upload size={14} />
+          Import
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={e => { if (e.target.files[0]) importNotes(e.target.files[0]); e.target.value = '' }}
+          className="hidden"
+        />
+      </div>
 
       {/* Dark Mode Toggle */}
       <div className="px-4 mb-3">

@@ -102,6 +102,43 @@ export function NotesProvider({ children }) {
     moveToTrash(id)
   }, [moveToTrash])
 
+  const exportNotes = useCallback(() => {
+    const data = notes.map(n => ({
+      title: n.title,
+      content: n.content,
+      tag: meta[n._id]?.tag || null,
+      favorite: meta[n._id]?.favorite || false
+    }))
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `memora-notes-${new Date().toISOString().slice(0,10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${data.length} notes`)
+  }, [notes, meta])
+
+  const importNotes = useCallback(async (file) => {
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+      if (!Array.isArray(data)) throw new Error('Invalid format')
+      let imported = 0
+      for (const item of data) {
+        if (!item.title || !item.content) continue
+        const res = await noteService.createNote({ title: item.title, content: item.content })
+        if (item.tag) updateMeta(res.note._id, { tag: item.tag })
+        if (item.favorite) updateMeta(res.note._id, { favorite: true })
+        imported++
+      }
+      await fetchNotes()
+      toast.success(`Imported ${imported} notes`)
+    } catch {
+      toast.error('Failed to import — invalid file format')
+    }
+  }, [fetchNotes, updateMeta])
+
   const tagCounts = {}
   const tags = ['Work', 'Personal', 'Ideas', 'Study']
   notes.forEach(n => {
@@ -133,7 +170,8 @@ export function NotesProvider({ children }) {
       fetchNotes, addNote, updateNote, removeNote,
       setSelectedNote, setShowModal, setShowDelete,
       setSearch, setFilter, setEditingNote,
-      toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag
+      toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag,
+      exportNotes, importNotes
     }}>
       {children}
     </NotesContext.Provider>

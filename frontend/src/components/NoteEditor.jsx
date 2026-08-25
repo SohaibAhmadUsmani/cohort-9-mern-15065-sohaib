@@ -4,7 +4,7 @@ import { Star, Pencil, Trash2, RotateCcw, Tag } from 'lucide-react'
 import { useNotes } from '../context/NotesContext'
 
 export default function NoteEditor() {
-  const { selectedNote, meta, toggleFavorite, moveToTrash, restoreFromTrash, setTag, setShowModal, setEditingNote, tags: tagList } = useNotes()
+  const { selectedNote, meta, toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag, setShowModal, setEditingNote, tags: tagList } = useNotes()
   const [showTagMenu, setShowTagMenu] = useState(false)
 
   const m = meta[selectedNote?._id] || {}
@@ -54,7 +54,10 @@ export default function NoteEditor() {
               </span>
             )}
             <span>•</span>
-            <span>{new Date(selectedNote.updatedAt || selectedNote.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            <span>{selectedNote.updatedAt || selectedNote.createdAt
+              ? new Date(selectedNote.updatedAt || selectedNote.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : 'Recently created'
+            }</span>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -97,13 +100,22 @@ export default function NoteEditor() {
             <Star size={18} fill={m.favorite ? 'currentColor' : 'none'} />
           </button>
           {isTrash ? (
-            <button
-              onClick={() => restoreFromTrash(selectedNote._id)}
-              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-green-400 hover:bg-[var(--bg-surface)] transition-colors"
-              title="Restore"
-            >
-              <RotateCcw size={18} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => restoreFromTrash(selectedNote._id)}
+                className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-green-400 hover:bg-[var(--bg-surface)] transition-colors"
+                title="Restore"
+              >
+                <RotateCcw size={18} />
+              </button>
+              <button
+                onClick={() => permanentDelete(selectedNote._id)}
+                className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-red-400 hover:bg-[var(--bg-surface)] transition-colors"
+                title="Delete Permanently"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
           ) : (
             <>
               <button onClick={handleEdit} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--bg-surface)] transition-colors" title="Edit">
