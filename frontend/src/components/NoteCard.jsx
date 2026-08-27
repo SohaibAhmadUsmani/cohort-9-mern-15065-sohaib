@@ -18,6 +18,8 @@ export default function NoteCard({ note, index }) {
     ? new Date(note.updatedAt || note.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
     : ''
 
+  const tagColors = { Work: '#A855F7', Personal: '#3b82f6', Ideas: '#22c55e', Study: '#f59e0b' }
+
   return (
     <motion.button
       initial={{ opacity: 0, y: 10 }}
@@ -38,7 +40,12 @@ export default function NoteCard({ note, index }) {
       <div className="flex items-center gap-2">
         <span className="text-[10px] text-[var(--text-secondary)] opacity-60">{time}</span>
         {m.tag && (
-          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--accent-light)] text-[var(--accent)] font-medium">{m.tag}</span>
+          <span
+            className="text-[9px] px-1.5 py-0.5 rounded-full font-medium"
+            style={{ background: tagColors[m.tag] + '20', color: tagColors[m.tag] }}
+          >
+            {m.tag}
+          </span>
         )}
       </div>
     </motion.button>
