@@ -1,48 +1,46 @@
 import { motion } from 'framer-motion'
+import { Star } from 'lucide-react'
 import { useNotes } from '../context/NotesContext'
 
 export default function NoteCard({ note, index }) {
-  const { setEditingNote, setShowModal, setShowDelete } = useNotes()
+  const { selectedNote, setSelectedNote, meta } = useNotes()
+  const isSelected = selectedNote?._id === note._id
+  const m = meta[note._id] || {}
 
-  const handleEdit = () => {
-    setEditingNote(note)
-    setShowModal(true)
+  const stripHtml = (html) => {
+    const tmp = document.createElement('div')
+    tmp.innerHTML = html
+    return tmp.textContent || tmp.innerText || ''
   }
 
-  const handleDelete = () => {
-    setShowDelete(note)
-  }
+  const preview = stripHtml(note.content || '').slice(0, 80)
+  const time = note.updatedAt || note.createdAt
+    ? new Date(note.updatedAt || note.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    : ''
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+    <motion.button
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ delay: index * 0.05 }}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col"
+      transition={{ delay: index * 0.03 }}
+      onClick={() => setSelectedNote(note)}
+      className={`w-full text-left p-4 rounded-xl transition-all ${
+        isSelected
+          ? 'bg-[var(--accent-light)] border border-[var(--accent)]/30'
+          : 'bg-[var(--bg-surface)] hover:bg-[var(--bg-surface)]/80 border border-transparent'
+      }`}
     >
-      <h3
-        className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1"
-        dangerouslySetInnerHTML={{ __html: note.title }}
-      />
-      <div
-        className="text-sm text-gray-500 dark:text-gray-400 flex-1 line-clamp-6 mb-4 prose prose-sm dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: note.content }}
-      />
-      <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-        <button
-          onClick={handleEdit}
-          className="px-3 py-1.5 text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
-        >
-          Edit
-        </button>
-        <button
-          onClick={handleDelete}
-          className="px-3 py-1.5 text-xs font-medium bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
-        >
-          Delete
-        </button>
+      <div className="flex items-start justify-between mb-1">
+        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1 flex-1">{stripHtml(note.title)}</h3>
+        {m.favorite && <Star size={12} className="text-amber-400 fill-amber-400 mt-0.5 ml-1 shrink-0" />}
       </div>
-    </motion.div>
+      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 mb-2">{preview}</p>
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-[var(--text-secondary)] opacity-60">{time}</span>
+        {m.tag && (
+          <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--accent-light)] text-[var(--accent)] font-medium">{m.tag}</span>
+        )}
+      </div>
+    </motion.button>
   )
 }

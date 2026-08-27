@@ -10,9 +10,7 @@ export default function Signup() {
   const [password, setPassword] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
-  if (user) {
-    return <Navigate to="/dashboard" replace />
-  }
+  if (user) return <Navigate to="/dashboard" replace />
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -28,69 +26,73 @@ export default function Signup() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-        <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
-          Create Account
-        </h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="signup-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Name
-            </label>
-            <input
-              id="signup-name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              placeholder="Your name"
-            />
-          </div>
-          <div>
-            <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Email
-            </label>
-            <input
-              id="signup-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Password
-            </label>
-            <input
-              id="signup-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              placeholder="At least 6 characters"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold rounded-lg transition-colors"
-          >
-            {submitting ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
-        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
-          Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">
-            Sign in
-          </Link>
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)] px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <img src="/MemoraLogo.png" alt="Memora" className="w-12 h-12 mx-auto mb-4 rounded-xl" />
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Create Account</h1>
+          <p className="text-sm text-[var(--text-secondary)] mt-1">Get started with Memora</p>
+        </div>
+        <div className="bg-[var(--bg-secondary)] rounded-2xl shadow-sm p-8 border border-[var(--border)]">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label htmlFor="signup-name" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                Name
+              </label>
+              <input
+                id="signup-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
+                placeholder="Your name"
+              />
+            </div>
+            <div>
+              <label htmlFor="signup-email" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                Email
+              </label>
+              <input
+                id="signup-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
+                placeholder="you@example.com"
+              />
+            </div>
+            <div>
+              <label htmlFor="signup-password" className="block text-sm font-medium text-[var(--text-primary)] mb-1.5">
+                Password
+              </label>
+              <input
+                id="signup-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/40 text-sm"
+                placeholder="At least 6 characters"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full py-2.5 px-4 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm"
+            >
+              {submitting ? 'Creating account...' : 'Create Account'}
+            </button>
+          </form>
+          <p className="text-center text-sm text-[var(--text-secondary)] mt-5">
+            Already have an account?{' '}
+            <Link to="/login" className="text-[var(--accent)] hover:underline font-medium">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
