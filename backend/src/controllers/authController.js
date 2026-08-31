@@ -5,18 +5,17 @@ const bcrypt = require('bcrypt');
 
 const signup=async(req,res)=>{
     try{
-        const name=req.body.name;
-        const email=req.body.email?.toLowerCase().trim();
-        const password=req.body.password;
-        if(!name || !email || !password){
+        const { name, email: rawEmail, password } = req.body;
+        if(!name || !rawEmail || !password){
             return res.status(400).json({message:"All fields are required"});
         }
-        if(typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string'){
+        if(typeof name !== 'string' || typeof rawEmail !== 'string' || typeof password !== 'string'){
             return res.status(400).json({message:"Invalid field types"});
         }
         if (Buffer.byteLength(password, 'utf8') > 72) {
             return res.status(400).json({ message: "Password must be at most 72 bytes" });
         }
+        const email=rawEmail.toLowerCase().trim();
         const existingUser=await User.findOne({email});
         if(existingUser){
             return res.status(400).json({message:"User Already Exists"});
@@ -39,15 +38,15 @@ const signup=async(req,res)=>{
 
 const login=async(req,res)=>{
     try{
-        const email=req.body.email?.toLowerCase().trim();
-        const password=req.body.password;
-        if(!email || !password){
+        const { email: rawEmail, password } = req.body;
+        if(!rawEmail || !password){
             return res.status(400).json({message:"Email and password are required"});
         }
-        if(typeof email !== 'string' || typeof password !== 'string'){
+        if(typeof rawEmail !== 'string' || typeof password !== 'string'){
             return res.status(400).json({message:"Invalid field types"});
         }
-        const user = await User.findOne({email:email});
+        const email=rawEmail.toLowerCase().trim();
+        const user = await User.findOne({email});
         const isValid = user ? await bcrypt.compare(password, user.password) : false;
         if(!isValid){
             return res.status(401).json({message:"Invalid Credentials"});
