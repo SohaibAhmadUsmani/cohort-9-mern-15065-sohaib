@@ -8,11 +8,11 @@ A full-stack MERN notes application with AI-powered note generation, rich text e
 
 ### Memora Logo
 
-![Memora Logo](pictures/Memora%20.png)
+![Memora Logo](pictures/Memora.png)
 
 ### Dashboard — Create Notes
 
-![Create Notes](pictures/create%20notes%20.png)
+![Create Notes](pictures/create-notes.png)
 
 ### Scribby AI Note Generator
 
