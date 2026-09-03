@@ -13,6 +13,13 @@ const toolbarOptions = [
   ['clean'],
 ]
 
+function stripHtml(html) {
+  if (!html) return ''
+  const tmp = document.createElement('div')
+  tmp.innerHTML = html
+  return tmp.textContent || tmp.innerText || ''
+}
+
 export default function NoteModal() {
   const { editingNote, showModal, setShowModal, setEditingNote, addNote, updateNote } = useNotes()
   const [title, setTitle] = useState('')
@@ -20,11 +27,12 @@ export default function NoteModal() {
   const [saving, setSaving] = useState(false)
   const [quillKey, setQuillKey] = useState(0)
   const pendingContent = useRef('')
+  const quillRef = useRef(null)
 
   useEffect(() => {
     if (showModal) {
       if (editingNote) {
-        setTitle(editingNote.title)
+        setTitle(stripHtml(editingNote.title))
         pendingContent.current = editingNote.content
       } else {
         setTitle('')
@@ -36,8 +44,10 @@ export default function NoteModal() {
   }, [editingNote, showModal])
 
   const handleQuillReady = (quill) => {
+    quillRef.current = quill
     if (pendingContent.current) {
       quill.root.innerHTML = pendingContent.current
+      setContent(quill.root.innerHTML)
     }
   }
 
@@ -47,20 +57,26 @@ export default function NoteModal() {
     setTitle('')
     setContent('')
     pendingContent.current = ''
+    quillRef.current = null
   }
+
+  let submitLabel = 'Save Note'
+  if (saving) submitLabel = 'Saving...'
+  else if (editingNote) submitLabel = 'Update'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!title.trim() || !content.trim()) return
+    const finalContent = quillRef.current?.root?.innerHTML || content
+    if (!title.trim() || !stripHtml(finalContent).trim()) return
     setSaving(true)
     try {
       if (editingNote) {
-        await updateNote(editingNote._id, title, content)
+        await updateNote(editingNote._id, title.trim(), finalContent)
       } else {
-        await addNote(title, content)
+        await addNote(title.trim(), finalContent)
       }
-    } catch {
-      // toast in context
+    } catch (_err) {
+      // toast handled in context
     } finally {
       setSaving(false)
     }
@@ -87,7 +103,7 @@ export default function NoteModal() {
               <h2 className="text-base font-semibold text-[var(--text-primary)]">
                 {editingNote ? 'Edit Note' : 'New Note'}
               </h2>
-              <button onClick={handleClose} className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors">
+              <button type="button" onClick={handleClose} className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors">
                 <X size={18} />
               </button>
             </div>
@@ -117,10 +133,10 @@ export default function NoteModal() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving || !title.trim() || !content.trim()}
+                  disabled={saving || !title.trim() || !stripHtml(content).trim()}
                   className="px-5 py-2 text-sm font-medium bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {saving ? 'Saving...' : editingNote ? 'Update' : 'Save Note'}
+                  {submitLabel}
                 </button>
               </div>
             </form>

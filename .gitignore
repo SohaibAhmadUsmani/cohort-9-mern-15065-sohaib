@@ -3,3 +3,7 @@ node_modules/
 memory.md
 package-lock.json
 frontend/dist/
+frontend/coverage/
+backend/coverage/
+backend/.nyc_output/
+.scannerwork/

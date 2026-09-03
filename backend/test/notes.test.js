@@ -82,11 +82,12 @@ describe('Notes API', () => {
     });
 
     it('should return 401 with invalid token', async () => {
-      await request(app)
+      const res = await request(app)
         .post('/api/notes')
         .set('Authorization', 'Bearer bad-token')
         .send({ title: 'Test', content: '<p>Test</p>' })
         .expect(401);
+      expect(res.body.message).to.equal('Invalid Token');
     });
 
     it('should create multiple notes for the same user', async () => {
@@ -137,10 +138,11 @@ describe('Notes API', () => {
     });
 
     it('should return 401 with invalid token', async () => {
-      await request(app)
+      const res = await request(app)
         .get('/api/notes')
         .set('Authorization', 'Bearer expired-token')
         .expect(401);
+      expect(res.body.message).to.equal('Invalid Token');
     });
   });
 
@@ -236,10 +238,11 @@ describe('Notes API', () => {
     });
 
     it('should return 401 without auth token', async () => {
-      await request(app)
+      const res = await request(app)
         .put(`/api/notes/${noteId}`)
         .send({ title: 'Test', content: '<p>Test</p>' })
         .expect(401);
+      expect(res.body.message).to.equal('Access Denied');
     });
 
     it('should not allow updating another users note', async () => {
@@ -278,10 +281,11 @@ describe('Notes API', () => {
 
     it('should return 404 for non-existent note', async () => {
       const fakeId = new mongoose.Types.ObjectId();
-      await request(app)
+      const res = await request(app)
         .delete(`/api/notes/${fakeId}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(404);
+      expect(res.body.message).to.equal('Note not found');
     });
 
     it('should return 400 for invalid note id format', async () => {

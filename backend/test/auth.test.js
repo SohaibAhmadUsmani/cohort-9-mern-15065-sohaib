@@ -219,10 +219,11 @@ describe('Auth API', () => {
     });
 
     it('should return 401 with malformed header', async () => {
-      await request(app)
+      const res = await request(app)
         .get('/api/auth/me')
         .set('Authorization', 'NotBearer sometoken')
         .expect(401);
+      expect(res.body.message).to.equal('Invalid Token');
     });
 
     it('should return 401 when user is deleted after token issued', async () => {

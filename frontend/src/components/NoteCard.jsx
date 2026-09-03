@@ -1,19 +1,29 @@
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
+import DOMPurify from 'dompurify'
 import { useNotes } from '../context/NotesContext'
+
+function noteId(noteOrId) {
+  const id = noteOrId?._id ?? noteOrId
+  return id == null ? '' : String(id)
+}
+
+function stripHtml(html) {
+  if (!html) return ''
+  const tmp = document.createElement('div')
+  tmp.innerHTML = html
+  return tmp.textContent || tmp.innerText || ''
+}
 
 export default function NoteCard({ note, index }) {
   const { selectedNote, setSelectedNote, meta } = useNotes()
-  const isSelected = selectedNote?._id === note._id
-  const m = meta[note._id] || {}
+  const isSelected = noteId(selectedNote) === noteId(note)
+  const m = meta[noteId(note)] || {}
+  const displayNote = isSelected && selectedNote ? selectedNote : note
 
-  const stripHtml = (html) => {
-    const tmp = document.createElement('div')
-    tmp.innerHTML = html
-    return tmp.textContent || tmp.innerText || ''
-  }
-
-  const preview = stripHtml(note.content || '').slice(0, 80)
+  const previewHtml = DOMPurify.sanitize(displayNote.content || '', {
+    ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'u', 'p', 'br', 'span'],
+  })
   const time = note.updatedAt || note.createdAt
     ? new Date(note.updatedAt || note.createdAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
     : ''
@@ -33,10 +43,13 @@ export default function NoteCard({ note, index }) {
       }`}
     >
       <div className="flex items-start justify-between mb-1">
-        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1 flex-1">{stripHtml(note.title)}</h3>
+        <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1 flex-1">{stripHtml(displayNote.title)}</h3>
         {m.favorite && <Star size={12} className="text-amber-400 fill-amber-400 mt-0.5 ml-1 shrink-0" />}
       </div>
-      <p className="text-xs text-[var(--text-secondary)] line-clamp-2 mb-2">{preview}</p>
+      <div
+        className="text-xs text-[var(--text-secondary)] line-clamp-2 mb-2 [&_strong]:font-semibold [&_b]:font-semibold [&_em]:italic [&_i]:italic"
+        dangerouslySetInnerHTML={{ __html: previewHtml || stripHtml(displayNote.content).slice(0, 80) }}
+      />
       <div className="flex items-center gap-2">
         <span className="text-[10px] text-[var(--text-secondary)] opacity-60">{time}</span>
         {m.tag && (

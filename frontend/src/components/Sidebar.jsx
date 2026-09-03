@@ -16,19 +16,25 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
     { id: 'trash', label: 'Trash', icon: Trash2 },
   ]
 
+  const handleFileImport = (e) => {
+    if (e.target.files[0]) importNotes(e.target.files[0])
+    e.target.value = ''
+  }
+
   const tagColors = { Work: '#A855F7', Personal: '#3b82f6', Ideas: '#22c55e', Study: '#f59e0b' }
 
   if (collapsed) {
     return (
       <>
-        <aside className="w-16 h-full flex flex-col bg-[var(--bg-secondary)] border-r border-[var(--border)] items-center py-4 gap-4">
-          <button onClick={() => setCollapsed(false)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors" title="Expand sidebar">
+        <aside className="w-16 shrink-0 h-full flex flex-col bg-[var(--bg-secondary)] border-r border-[var(--border)] items-center py-4 gap-4">
+          <button type="button" onClick={() => setCollapsed(false)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors" title="Expand sidebar">
             <PanelLeft size={18} />
           </button>
           <img src="/MemoraLogo.png" alt="M" className="w-8 h-8 rounded-lg" />
           <div className="w-8 h-px bg-[var(--border)]" />
           {navItems.map(item => (
             <button
+              type="button"
               key={item.id}
               onClick={() => setFilter(item.id)}
               className={`p-2 rounded-lg transition-colors ${filter === item.id ? 'text-[var(--accent)] bg-[var(--accent-light)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]'}`}
@@ -37,14 +43,14 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
               <item.icon size={18} />
             </button>
           ))}
-          <button onClick={() => setScribbyOpen(true)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors" title="Scribby">
+          <button type="button" onClick={() => setScribbyOpen(true)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors" title="Scribby">
             <img src="/koala.png" alt="S" className="w-[18px] h-[18px] rounded" />
           </button>
           <div className="flex-1" />
-          <button onClick={() => setDark(d => !d)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors" title="Toggle theme">
+          <button type="button" onClick={() => setDark(d => !d)} className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors" title="Toggle theme">
             {dark ? <Moon size={18} /> : <Sun size={18} />}
           </button>
-          <button onClick={onLogout} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-red-500 hover:bg-[var(--bg-surface)] transition-colors" title="Logout">
+          <button type="button" onClick={onLogout} className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-red-500 hover:bg-[var(--bg-surface)] transition-colors" title="Logout">
             <LogOut size={18} />
           </button>
         </aside>
@@ -55,23 +61,24 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
 
   return (
     <>
-      <aside className="w-64 h-full flex flex-col bg-[var(--bg-secondary)] border-r border-[var(--border)]">
+      <aside className="w-64 shrink-0 h-full flex flex-col bg-[var(--bg-secondary)] border-r border-[var(--border)]">
         <div className="px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/MemoraLogo.png" alt="Memora" className="w-9 h-9 rounded-xl" />
             <span className="text-lg font-semibold text-[var(--text-primary)]">Memora</span>
           </div>
-          <button onClick={() => setCollapsed(true)} className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors" title="Collapse sidebar">
+          <button type="button" onClick={() => setCollapsed(true)} className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors" title="Collapse sidebar">
             <PanelLeftClose size={16} />
           </button>
         </div>
 
         <div className="px-4 mb-4">
           <button
+            type="button"
             onClick={() => setShowModal(true)}
             className="w-full py-2.5 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium text-sm transition-colors flex items-center justify-center gap-2"
           >
-            <span className="text-lg leading-none">+</span>
+            <span className="text-lg leading-none">+</span>{' '}
             New Note
           </button>
         </div>
@@ -79,6 +86,7 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
         <nav className="px-3 mb-6">
           {navItems.map(item => (
             <button
+              type="button"
               key={item.id}
               onClick={() => setFilter(item.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-1 ${
@@ -92,10 +100,11 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
             </button>
           ))}
           <button
+            type="button"
             onClick={() => setScribbyOpen(true)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-light)] transition-colors"
           >
-            <img src="/koala.png" alt="S" className="w-[18px] h-[18px] rounded" />
+            <img src="/koala.png" alt="S" className="w-[18px] h-[18px] rounded" />{' '}
             Scribby
           </button>
         </nav>
@@ -104,6 +113,7 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
           <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">Tags</h3>
           {tags.map(tag => (
             <button
+              type="button"
               key={tag}
               onClick={() => setFilter(filter === tag ? 'all' : tag)}
               className={`w-full flex items-center justify-between py-1.5 transition-colors ${
@@ -123,6 +133,7 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
 
         <div className="px-4 mb-3 flex gap-2">
           <button
+            type="button"
             onClick={exportNotes}
             className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors border border-[var(--border)]"
           >
@@ -130,6 +141,7 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
             Export
           </button>
           <button
+            type="button"
             onClick={() => fileInputRef.current?.click()}
             className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors border border-[var(--border)]"
           >
@@ -140,13 +152,14 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
             ref={fileInputRef}
             type="file"
             accept=".json"
-            onChange={e => { if (e.target.files[0]) importNotes(e.target.files[0]); e.target.value = '' }}
+            onChange={handleFileImport}
             className="hidden"
           />
         </div>
 
         <div className="px-4 mb-3">
           <button
+            type="button"
             onClick={() => setDark(d => !d)}
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors"
           >
@@ -169,7 +182,7 @@ export default function Sidebar({ dark, setDark, collapsed, setCollapsed, onLogo
               <p className="text-sm font-medium text-[var(--text-primary)] truncate">{user?.name || 'User'}</p>
               <p className="text-xs text-[var(--text-secondary)] truncate">{user?.email || ''}</p>
             </div>
-            <button onClick={onLogout} className="p-1.5 text-[var(--text-secondary)] hover:text-red-500 transition-colors" title="Logout">
+            <button type="button" onClick={onLogout} className="p-1.5 text-[var(--text-secondary)] hover:text-red-500 transition-colors" title="Logout">
               <LogOut size={16} />
             </button>
           </div>

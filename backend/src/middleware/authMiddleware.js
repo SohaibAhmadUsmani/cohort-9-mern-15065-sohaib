@@ -10,7 +10,7 @@ const authMiddleware = async(req,res,next)=>{
             return res.status(401).json({message:"Access Denied"});
         }
         const decoded = jsonwebtoken.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id);
+        const user = await User.findById(decoded.id).select('-password');
         if(!user){
             return res.status(401).json({message:"Invalid Token"});
         }

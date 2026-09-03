@@ -4,12 +4,12 @@ const logger = require('../config/logger');
 const generate = async (req, res) => {
   try {
     const { prompt } = req.body;
-    if (!prompt || !prompt.trim()) {
+    if (!prompt?.trim()) {
       return res.status(400).json({ message: 'Prompt is required' });
     }
 
     const note = await generateNote(prompt.trim());
-    logger.info(`AI note generated for user ${req.user._id}`);
+    logger.info({ userId: req.user._id }, 'AI note generated');
     return res.status(200).json({ note });
   } catch (err) {
     logger.error({ err }, 'AI generate failed');

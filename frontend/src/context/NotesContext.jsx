@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react'
 import noteService from '../services/noteService'
 import toast from 'react-hot-toast'
 
@@ -15,6 +15,11 @@ function saveMeta(meta) {
   localStorage.setItem(META_KEY, JSON.stringify(meta))
 }
 
+function noteId(noteOrId) {
+  const id = noteOrId?._id ?? noteOrId
+  return id == null ? '' : String(id)
+}
+
 export function NotesProvider({ children }) {
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(false)
@@ -28,45 +33,122 @@ export function NotesProvider({ children }) {
 
   useEffect(() => { saveMeta(meta) }, [meta])
 
-  const updateMeta = useCallback((noteId, updates) => {
+  const getFilteredNotes = useCallback((noteList, metaMap, activeFilter, searchQuery) => {
+    return noteList.filter(note => {
+      const id = noteId(note)
+      const m = metaMap[id]
+      if (m?.deleted && activeFilter !== 'trash') return false
+      if (!m?.deleted && activeFilter === 'trash') return false
+      if (activeFilter === 'favorites' && !m?.favorite) return false
+      if (activeFilter !== 'all' && activeFilter !== 'favorites' && activeFilter !== 'trash') {
+        if (m?.tag !== activeFilter) return false
+      }
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase()
+        return (note.title || '').toLowerCase().includes(q) || (note.content || '').toLowerCase().includes(q)
+      }
+      return true
+    })
+  }, [])
+
+  const pickSelection = useCallback((noteList, metaMap, activeFilter, searchQuery, prefer) => {
+    const visible = getFilteredNotes(noteList, metaMap, activeFilter, searchQuery)
+    if (visible.length === 0) return null
+    const preferId = noteId(prefer)
+    if (preferId && visible.some(n => noteId(n) === preferId)) {
+      return noteList.find(n => noteId(n) === preferId) || visible[0]
+    }
+    return visible[0]
+  }, [getFilteredNotes])
+
+  const selectNote = useCallback((note) => {
+    setSelectedNote(note)
+  }, [])
+
+  const changeFilter = useCallback((nextFilter) => {
+    setFilter(nextFilter)
+    setSelectedNote(prev => pickSelection(notes, meta, nextFilter, search, prev))
+  }, [notes, meta, search, pickSelection])
+
+  const changeSearch = useCallback((nextSearch) => {
+    setSearch(nextSearch)
+  }, [])
+
+  // Only change selection when filter/search hides the current note
+  useEffect(() => {
+    setSelectedNote(prev => {
+      if (!prev) return prev
+      const visible = getFilteredNotes(notes, meta, filter, search)
+      if (visible.some(n => noteId(n) === noteId(prev))) {
+        return notes.find(n => noteId(n) === noteId(prev)) || prev
+      }
+      return visible[0] || null
+    })
+  }, [filter, search])
+
+  const updateMeta = useCallback((id, updates) => {
+    const key = noteId(id)
     setMeta(prev => ({
       ...prev,
-      [noteId]: { ...(prev[noteId] || {}), ...updates }
+      [key]: { ...prev[key], ...updates }
     }))
   }, [])
 
-  const toggleFavorite = useCallback((noteId) => {
+  const toggleFavorite = useCallback((id) => {
+    const key = noteId(id)
     setMeta(prev => ({
       ...prev,
-      [noteId]: { ...(prev[noteId] || {}), favorite: !(prev[noteId]?.favorite) }
+      [key]: { ...prev[key], favorite: !prev[key]?.favorite }
     }))
   }, [])
 
-  const moveToTrash = useCallback((noteId) => {
-    updateMeta(noteId, { deleted: true })
-    if (selectedNote?._id === noteId) setSelectedNote(null)
+  const moveToTrash = useCallback((id) => {
+    const key = noteId(id)
+    const nextMeta = { ...meta, [key]: { ...meta[key], deleted: true } }
+    setMeta(nextMeta)
+    setSelectedNote(current => {
+      if (noteId(current) !== key) return current
+      return pickSelection(notes, nextMeta, filter, search, null)
+    })
     toast.success('Moved to trash')
-  }, [selectedNote, updateMeta])
+  }, [notes, meta, filter, search, pickSelection])
 
-  const restoreFromTrash = useCallback((noteId) => {
-    updateMeta(noteId, { deleted: false })
+  const restoreFromTrash = useCallback((id) => {
+    updateMeta(id, { deleted: false })
     toast.success('Restored from trash')
   }, [updateMeta])
 
-  const permanentDelete = useCallback(async (noteId) => {
-    try {
-      await noteService.deleteNote(noteId)
-      setNotes(prev => prev.filter(n => n._id !== noteId))
-      setMeta(prev => { const next = { ...prev }; delete next[noteId]; return next })
-      if (selectedNote?._id === noteId) setSelectedNote(null)
-      toast.success('Permanently deleted')
-    } catch {
-      toast.error('Failed to delete note')
+  const permanentDelete = useCallback(async (id) => {
+    const key = noteId(id)
+    const token = localStorage.getItem('token')
+    if (!token) {
+      toast.error('Session expired. Please log in again.')
+      window.dispatchEvent(new Event('auth:logout'))
+      return
     }
-  }, [selectedNote])
+    try {
+      await noteService.deleteNote(key)
+      const remaining = notes.filter(n => noteId(n) !== key)
+      const nextMeta = { ...meta }
+      delete nextMeta[key]
+      setNotes(remaining)
+      setMeta(nextMeta)
+      setSelectedNote(prev => {
+        if (noteId(prev) !== key) return prev
+        return pickSelection(remaining, nextMeta, filter, search, null)
+      })
+      toast.success('Permanently deleted')
+    } catch (err) {
+      if (err.response?.status === 401) {
+        toast.error('Session expired. Please log in again.')
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to delete note')
+      }
+    }
+  }, [notes, meta, filter, search, pickSelection])
 
-  const setTag = useCallback((noteId, tag) => {
-    updateMeta(noteId, { tag })
+  const setTag = useCallback((id, tag) => {
+    updateMeta(id, { tag })
   }, [updateMeta])
 
   const fetchNotes = useCallback(async () => {
@@ -74,10 +156,14 @@ export function NotesProvider({ children }) {
     try {
       const data = await noteService.getNotes()
       setNotes(data)
-      if (data.length > 0 && !selectedNote) {
-        const first = data.find(n => !meta[n._id]?.deleted)
-        if (first) setSelectedNote(first)
-      }
+      setSelectedNote(prev => {
+        if (prev && data.some(n => noteId(n) === noteId(prev))) {
+          return data.find(n => noteId(n) === noteId(prev)) || prev
+        }
+        const storedMeta = loadMeta()
+        const first = data.find(n => !storedMeta[noteId(n)]?.deleted)
+        return first || data[0] || null
+      })
     } catch {
       toast.error('Failed to load notes')
     } finally {
@@ -86,29 +172,49 @@ export function NotesProvider({ children }) {
   }, [])
 
   const addNote = useCallback(async (title, content) => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      toast.error('Session expired. Please log in again.')
+      window.dispatchEvent(new Event('auth:logout'))
+      return
+    }
     try {
       const res = await noteService.createNote({ title, content })
+      if (!res?.note) {
+        toast.error('Failed to create note')
+        return
+      }
       setNotes(prev => [res.note, ...prev])
       setSelectedNote(res.note)
       toast.success('Note created')
       setShowModal(false)
-    } catch {
-      toast.error('Failed to create note')
+    } catch (err) {
+      if (err.response?.status === 401) {
+        toast.error('Session expired. Please log in again.')
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to create note')
+      }
     }
   }, [])
 
   const updateNote = useCallback(async (id, title, content) => {
     try {
       const res = await noteService.updateNote(id, { title, content })
-      setNotes(prev => prev.map(n => n._id === id ? res.note : n))
-      if (selectedNote?._id === id) setSelectedNote(res.note)
+      const updated = res?.note
+      const targetId = noteId(id)
+      if (!updated || !noteId(updated)) {
+        toast.error('Failed to update note')
+        return
+      }
+      setNotes(prev => prev.map(n => noteId(n) === targetId ? { ...n, ...updated, title, content } : n))
+      setSelectedNote({ ...updated, title, content })
       toast.success('Note updated')
       setEditingNote(null)
       setShowModal(false)
     } catch {
       toast.error('Failed to update note')
     }
-  }, [selectedNote])
+  }, [])
 
   const removeNote = useCallback(async (id) => {
     moveToTrash(id)
@@ -118,8 +224,8 @@ export function NotesProvider({ children }) {
     const data = notes.map(n => ({
       title: n.title,
       content: n.content,
-      tag: meta[n._id]?.tag || null,
-      favorite: meta[n._id]?.favorite || false
+      tag: meta[noteId(n)]?.tag || null,
+      favorite: meta[noteId(n)]?.favorite || false
     }))
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -154,37 +260,33 @@ export function NotesProvider({ children }) {
   const tagCounts = {}
   const tags = ['Work', 'Personal', 'Ideas', 'Study']
   notes.forEach(n => {
-    const m = meta[n._id]
+    const m = meta[noteId(n)]
     if (m?.tag && !m?.deleted) {
       tagCounts[m.tag] = (tagCounts[m.tag] || 0) + 1
     }
   })
 
-  const filteredNotes = notes.filter(note => {
-    const m = meta[note._id]
-    if (m?.deleted && filter !== 'trash') return false
-    if (!m?.deleted && filter === 'trash') return false
-    if (filter === 'favorites' && !m?.favorite) return false
-    if (filter !== 'all' && filter !== 'favorites' && filter !== 'trash') {
-      if (m?.tag !== filter) return false
-    }
-    if (search) {
-      const q = search.toLowerCase()
-      return (note.title || '').toLowerCase().includes(q) || (note.content || '').toLowerCase().includes(q)
-    }
-    return true
-  })
+  const filteredNotes = getFilteredNotes(notes, meta, filter, search)
+
+  const contextValue = useMemo(() => ({
+    notes, filteredNotes, loading, selectedNote, showModal, showDelete,
+    search, filter, editingNote, meta, tagCounts, tags,
+    fetchNotes, addNote, updateNote, removeNote,
+    setSelectedNote: selectNote, setShowModal, setShowDelete,
+    setSearch: changeSearch, setFilter: changeFilter, setEditingNote,
+    toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag,
+    exportNotes, importNotes
+  }), [
+    notes, filteredNotes, loading, selectedNote, showModal, showDelete,
+    search, filter, editingNote, meta, tagCounts, tags,
+    fetchNotes, addNote, updateNote, removeNote,
+    selectNote, changeSearch, changeFilter,
+    toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag,
+    exportNotes, importNotes
+  ])
 
   return (
-    <NotesContext.Provider value={{
-      notes, filteredNotes, loading, selectedNote, showModal, showDelete,
-      search, filter, editingNote, meta, tagCounts, tags,
-      fetchNotes, addNote, updateNote, removeNote,
-      setSelectedNote, setShowModal, setShowDelete,
-      setSearch, setFilter, setEditingNote,
-      toggleFavorite, moveToTrash, restoreFromTrash, permanentDelete, setTag,
-      exportNotes, importNotes
-    }}>
+    <NotesContext.Provider value={contextValue}>
       {children}
     </NotesContext.Provider>
   )

@@ -60,6 +60,7 @@ export default function Scribby({ open, setOpen }) {
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => { if (!generating) setOpen(false) }}
                 className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors"
               >
@@ -82,6 +83,7 @@ export default function Scribby({ open, setOpen }) {
               <div className="flex flex-wrap gap-2">
                 {suggestions.map(s => (
                   <button
+                    type="button"
                     key={s}
                     onClick={() => setPrompt(s)}
                     className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] transition-colors"
@@ -93,6 +95,7 @@ export default function Scribby({ open, setOpen }) {
             </div>
 
             <button
+              type="button"
               onClick={() => handleGenerate(prompt)}
               disabled={!prompt.trim() || generating}
               className="w-full py-2.5 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"

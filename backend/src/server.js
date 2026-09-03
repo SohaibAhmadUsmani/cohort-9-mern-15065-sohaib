@@ -13,4 +13,6 @@ for (const key of ['MONGO_URI', 'JWT_SECRET']) {
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
     app.listen(PORT, () => { logger.info(`Server is running on port ${PORT}`) });
+}).catch(() => {
+    process.exit(1);
 });

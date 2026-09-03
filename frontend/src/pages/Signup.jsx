@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 
 export default function Signup() {
   const { user, signup } = useAuth()
+  const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -18,6 +19,7 @@ export default function Signup() {
     try {
       await signup(name, email, password)
       toast.success('Account created successfully')
+      navigate('/dashboard', { replace: true })
     } catch (err) {
       toast.error(err.response?.data?.message || 'Signup failed')
     } finally {

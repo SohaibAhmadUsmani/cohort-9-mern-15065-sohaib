@@ -23,10 +23,8 @@ beforeEach(() => {
 });
 
 describe('AuthContext', () => {
-  test('starts with loading true then false when no token', async () => {
-    await act(async () => {
-      render(<AuthProvider><TestComponent /></AuthProvider>);
-    });
+  test('starts with loading true then false when no token', () => {
+    render(<AuthProvider><TestComponent /></AuthProvider>);
     expect(screen.getByTestId('loading').textContent).toBe('false');
     expect(screen.getByTestId('user').textContent).toBe('null');
   });
@@ -35,9 +33,8 @@ describe('AuthContext', () => {
     localStorage.setItem('token', 'fake-token');
     api.get.mockResolvedValue({ data: { user: { name: 'Alice' } } });
 
-    await act(async () => {
-      render(<AuthProvider><TestComponent /></AuthProvider>);
-    });
+    render(<AuthProvider><TestComponent /></AuthProvider>);
+    await act(async () => {});
     expect(screen.getByTestId('user').textContent).toBe('Alice');
   });
 
@@ -45,9 +42,7 @@ describe('AuthContext', () => {
     api.post.mockResolvedValue({ data: { token: 'new-token' } });
     api.get.mockResolvedValue({ data: { user: { name: 'Bob' } } });
 
-    await act(async () => {
-      render(<AuthProvider><TestComponent /></AuthProvider>);
-    });
+    render(<AuthProvider><TestComponent /></AuthProvider>);
     await act(async () => {
       screen.getByText('login').click();
     });
@@ -59,9 +54,7 @@ describe('AuthContext', () => {
     api.post.mockResolvedValue({ data: { token: 'signup-token' } });
     api.get.mockResolvedValue({ data: { user: { name: 'Carol' } } });
 
-    await act(async () => {
-      render(<AuthProvider><TestComponent /></AuthProvider>);
-    });
+    render(<AuthProvider><TestComponent /></AuthProvider>);
     await act(async () => {
       screen.getByText('signup').click();
     });
@@ -73,9 +66,8 @@ describe('AuthContext', () => {
     localStorage.setItem('token', 'some-token');
     api.get.mockResolvedValue({ data: { user: { name: 'Dave' } } });
 
-    await act(async () => {
-      render(<AuthProvider><TestComponent /></AuthProvider>);
-    });
+    render(<AuthProvider><TestComponent /></AuthProvider>);
+    await act(async () => {});
     expect(screen.getByTestId('user').textContent).toBe('Dave');
 
     await act(async () => {
@@ -89,9 +81,8 @@ describe('AuthContext', () => {
     localStorage.setItem('token', 'bad-token');
     api.get.mockRejectedValue(new Error('Unauthorized'));
 
-    await act(async () => {
-      render(<AuthProvider><TestComponent /></AuthProvider>);
-    });
+    render(<AuthProvider><TestComponent /></AuthProvider>);
+    await act(async () => {});
     expect(screen.getByTestId('user').textContent).toBe('null');
     expect(localStorage.getItem('token')).toBeNull();
   });
@@ -100,9 +91,7 @@ describe('AuthContext', () => {
     api.get.mockResolvedValue({ data: { user: null } });
     api.post.mockRejectedValue(new Error('Invalid credentials'));
 
-    await act(async () => {
-      render(<AuthProvider><TestComponent /></AuthProvider>);
-    });
+    render(<AuthProvider><TestComponent /></AuthProvider>);
 
     await act(async () => {
       screen.getByText('login').click();

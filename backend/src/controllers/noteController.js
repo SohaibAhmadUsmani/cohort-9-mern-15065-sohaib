@@ -1,43 +1,47 @@
 const Note = require('../models/note');
 const logger = require('../config/logger');
-const createNote = async (req,res) => {
+
+const createNote = async (req, res) => {
     try {
-        const {title, content}=req.body;
-        if (!title||!content) {
-            return res.status(400).json({message:'Title and content are required'});
+        const { title, content } = req.body;
+        if (!title || !content) {
+            return res.status(400).json({ message: 'Title and content are required' });
         }
         const note = new Note({ title, content, user: req.user._id });
         await note.save();
-        logger.info(`Note created: ${note._id} by user ${req.user._id}`);
+        logger.info({ noteId: note._id, userId: req.user._id }, 'Note created');
         return res.status(201).json({ message: 'Note created successfully', note });
     } catch (err) {
-        logger.error({err},'Create note failed');
+        logger.error({ err }, 'Create note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
-const getNotes=async(req, res) => {
+
+const getNotes = async (req, res) => {
     try {
         const notes = await Note.find({ user: req.user._id });
-        logger.info(`Notes fetched for user ${req.user._id}: ${notes.length} notes`);
+        logger.info({ userId: req.user._id, count: notes.length }, 'Notes fetched');
         return res.status(200).json({ notes });
     } catch (err) {
-        logger.error({err},'Get notes failed');
+        logger.error({ err }, 'Get notes failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 const getNote = async (req, res) => {
     try {
         const note = await Note.findOne({ _id: req.params.id, user: req.user._id });
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
         }
-        logger.info(`Note fetched: ${note._id} by user ${req.user._id}`);
+        logger.info({ noteId: note._id, userId: req.user._id }, 'Note fetched');
         return res.status(200).json({ note });
     } catch (err) {
-        logger.error({err},'Get note failed');
+        logger.error({ err }, 'Get note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 const updateNote = async (req, res) => {
     try {
         const { title, content } = req.body;
@@ -52,24 +56,26 @@ const updateNote = async (req, res) => {
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
         }
-        logger.info(`Note updated: ${note._id} by user ${req.user._id}`);
+        logger.info({ noteId: note._id, userId: req.user._id }, 'Note updated');
         return res.status(200).json({ message: 'Note updated successfully', note });
     } catch (err) {
-        logger.error({err},'Update note failed');
+        logger.error({ err }, 'Update note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 const deleteNote = async (req, res) => {
     try {
         const note = await Note.findOneAndDelete({ _id: req.params.id, user: req.user._id });
         if (!note) {
             return res.status(404).json({ message: 'Note not found' });
         }
-        logger.info(`Note deleted: ${note._id} by user ${req.user._id}`);
+        logger.info({ noteId: note._id, userId: req.user._id }, 'Note deleted');
         return res.status(200).json({ message: 'Note deleted successfully' });
     } catch (err) {
-        logger.error({err},'Delete note failed');
+        logger.error({ err }, 'Delete note failed');
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
 module.exports = { createNote, getNotes, getNote, updateNote, deleteNote };
