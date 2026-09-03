@@ -2,19 +2,29 @@
 
 A full-stack MERN notes application with AI-powered note generation, rich text editing, and a premium UI with dark mode.
 
-![Memora Logo](frontend/public/MemoraLogo.png)
-
 ---
 
 ## Screenshots
 
-| Dashboard | Scribby AI | Sidebar |
-|-----------|-----------|---------|
-| ![Create Notes](pictures/create%20notes%20.png) | ![Scribby](pictures/scribby.png) | ![Sidebar](pictures/sidebar.png) |
+### Memora Logo
+
+![Memora Logo](pictures/Memora%20.png)
+
+### Dashboard — Create Notes
+
+![Create Notes](pictures/create%20notes%20.png)
+
+### Scribby AI Note Generator
+
+![Scribby](pictures/scribby.png)
+
+### Sidebar Navigation
+
+![Sidebar](pictures/sidebar.png)
 
 ### SonarQube Quality Gate
 
-![SonarQube Dashboard](pictures/sonarqube-dashboard.png)
+![SonarQube](pictures/Sonarqube.png)
 
 ---
 
