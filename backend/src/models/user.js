@@ -7,10 +7,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         lowercase: true,
         trim: true,
-        validate: { validator: (v) => {
-            const [local, domain] = v.split('@');
-            return local?.length > 0 && domain?.includes('.');
-        }, message: 'Enter a valid email' }
+        match: [/^\S+@\S+\.\S+$/, 'Enter a valid email']
     },
     password: { type: String, required: true }
 });

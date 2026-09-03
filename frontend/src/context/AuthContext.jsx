@@ -40,16 +40,26 @@ export function AuthProvider({ children }) {
   const signup = useCallback(async (name, email, password) => {
     const res = await api.post('/auth/signup', { name, email, password })
     localStorage.setItem('token', res.data.token)
-    const me = await api.get('/auth/me', authConfig())
-    setUser(me.data.user)
+    try {
+      const me = await api.get('/auth/me', authConfig())
+      setUser(me.data.user)
+    } catch {
+      localStorage.removeItem('token')
+      setUser(null)
+    }
     return res.data
   }, [])
 
   const login = useCallback(async (email, password) => {
     const res = await api.post('/auth/login', { email, password })
     localStorage.setItem('token', res.data.token)
-    const me = await api.get('/auth/me', authConfig())
-    setUser(me.data.user)
+    try {
+      const me = await api.get('/auth/me', authConfig())
+      setUser(me.data.user)
+    } catch {
+      localStorage.removeItem('token')
+      setUser(null)
+    }
     return res.data
   }, [])
 
